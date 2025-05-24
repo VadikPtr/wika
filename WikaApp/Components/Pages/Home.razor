@@ -1,0 +1,18 @@
+﻿@page "/"
+@attribute [GoogleScopedAuthorize]
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, @HttpContext?.User.FindFirst("name")?.Value</h1>
+<img src="@HttpContext?.User.FindFirst("picture")?.Value" alt="picture"/>
+
+<a href="/logout">Logout</a>
+
+@code {
+    [CascadingParameter] public HttpContext? HttpContext { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // name, picture
+    }
+}

@@ -1,0 +1,74 @@
+@using System.Net.Mail
+@using Microsoft.EntityFrameworkCore
+@if (!string.IsNullOrEmpty(error))
+{
+  <div class="alert alert-danger" role="alert">
+    Error: @error
+  </div>
+}
+
+<form class="g-2 my-3 input-group" method="post" @onsubmit="add_user" @formname="add_user_email">
+  <InputText class="form-control add-user-email" placeholder="Email" @bind-Value="add_user_email" />
+  <button class="btn btn-outline-primary" type="submit">
+    <i class="bi bi-person-fill-add"></i>
+    <!-- this is dirty hack to make bootstrap rounding work -->
+    <AntiforgeryToken/>
+  </button>
+</form>
+
+<style>
+  .add-user-email {
+    border-top-left-radius: .25rem !important;
+    border-bottom-left-radius: .25rem !important;
+  }
+</style>
+
+@code
+{
+  [Inject] private AppDbContext      db_context         { get; set; } = null!;
+  [Inject] private NavigationManager navigation_manager { get; set; } = null!;
+  [Inject] private ILogger<AddUser>  logger             { get; set; } = null!;
+
+  [SupplyParameterFromForm] private string? add_user_email { get; set; }
+
+  private string? error { get; set; }
+  private bool    need_refresh = false;
+
+  private Task add_user() => handle_errors(async () =>
+  {
+    logger.LogInformation("Try add user '{}'", add_user_email);
+    if (string.IsNullOrEmpty(add_user_email))
+      throw new Exception("Email is empty");
+
+    _ = new MailAddress(add_user_email); // validation
+
+    db_context.users.Add(new UserStored { email = add_user_email });
+    await db_context.SaveChangesAsync();
+    need_refresh = true;
+  });
+
+  private async Task handle_errors(Func<Task> action)
+  {
+    try
+    {
+      await action();
+      error = null;
+    }
+    catch (DbUpdateException e)
+    {
+      error = e.InnerException?.Message ?? e.Message;
+      db_context.ChangeTracker.Clear();
+    }
+    catch (Exception e)
+    {
+      error = e.Message;
+    }
+    finally
+    {
+      if (need_refresh)
+      {
+        navigation_manager.Refresh();
+      }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+@using Microsoft.EntityFrameworkCore
+@inherits LayoutComponentBase
+
+<MainLayout>
+  <Body>
+  <nav class="nav flex-column">
+    @foreach (var path in pages_paths)
+    {
+      <NavLink class="nav-link" href=@("/pages/" + path) Match="NavLinkMatch.All">
+        @path
+      </NavLink>
+    }
+  </nav>
+  @Body
+  </Body>
+</MainLayout>
+
+@code
+{
+  [Inject] private AppDbContext db_context { get; set; } = null!;
+
+  private string[] pages_paths { get; set; } = [];
+
+  protected override async Task OnInitializedAsync()
+  {
+    await base.OnInitializedAsync();
+    pages_paths = await db_context.pages
+      .OrderBy(x => x.path)
+      .Select(x => x.path)
+      .ToArrayAsync();
+  }
+}

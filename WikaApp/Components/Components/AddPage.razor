@@ -1,0 +1,80 @@
+@using Microsoft.EntityFrameworkCore
+
+<form method="post" @onsubmit="add_page" @formname="add_page">
+  <InputText @bind-Value="add_path" hidden/>
+  <button class="btn btn-outline-primary" type="submit">
+    Create
+
+    <!-- this is dirty hack to make bootstrap rounding work -->
+    <AntiforgeryToken/>
+  </button>
+</form>
+
+@if (!string.IsNullOrEmpty(error))
+{
+  <div class="alert alert-danger" role="alert">
+    Error: @error
+  </div>
+}
+
+@code
+{
+  [Inject] private AppDbContext      db_context         { get; set; } = null!;
+  [Inject] private ILogger<AddPage>  logger             { get; set; } = null!;
+  [Inject] private NavigationManager navigation_manager { get; set; } = null!;
+
+  [Parameter] public string path { get; set; } = null!;
+
+  [SupplyParameterFromForm] private string? add_path { get; set; }
+
+  private string? error { get; set; }
+  private bool    needs_refresh;
+
+  protected override async Task OnInitializedAsync()
+  {
+    add_path = path;
+  }
+
+  private Task add_page() => handle_errors(async () =>
+  {
+    logger.LogInformation("Try add user '{}'", add_path);
+    if (string.IsNullOrWhiteSpace(add_path) || add_path.StartsWith(' ') || add_path.EndsWith(' '))
+      throw new Exception("Bad page path");
+
+    db_context.pages.Add(new PageStored
+    {
+      path          = add_path,
+      content       = "...",
+      last_modified = DateTimeOffset.Now,
+    });
+    await db_context.SaveChangesAsync();
+    needs_refresh = true;
+  });
+
+  private async Task handle_errors(Func<Task> action)
+  {
+    try
+    {
+      await action();
+      error = null;
+    }
+    catch (DbUpdateException e)
+    {
+      logger.LogError(e, "");
+      error = e.InnerException?.Message ?? e.Message;
+      db_context.ChangeTracker.Clear();
+    }
+    catch (Exception e)
+    {
+      logger.LogError(e, "");
+      error = e.Message;
+    }
+    finally
+    {
+      if (needs_refresh)
+      {
+        navigation_manager.Refresh();
+      }
+    }
+  }
+}

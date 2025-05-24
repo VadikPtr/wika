@@ -1,106 +1,30 @@
 ﻿@page "/users"
-@using System.Net.Mail
 @using Microsoft.EntityFrameworkCore
 @using WikaApp.Auth
+@using WikaApp.Components.Components
 @attribute [RequireAuthorization]
-@rendermode InteractiveServer
 
 <h3>Users</h3>
 
-<div class="page-wrapper">
-  @if (!string.IsNullOrEmpty(error))
-  {
-    <div class="alert alert-danger" role="alert">
-      Error: @error
-    </div>
-  }
-
-  <form class="g-2 my-3 input-group" method="post" @onsubmit="add_user" @formname="add_user_email">
-    <InputText class="form-control" placeholder="Email" aria-describedby="button-addon1"
-               @bind-Value="add_user_email"/>
-    <button class="btn btn-outline-primary" type="submit" id="button-addon1">
-      <i class="bi bi-person-fill-add"></i>
-
-      <!-- this is dirty hack to make bootstrap rounding work -->
-      <AntiforgeryToken/>
-    </button>
-  </form>
-
+<div style="max-width: 400px;">
+  <AddUser/>
   @foreach (var email in emails)
   {
-    <div class="mt-1">
-      @email
-      <button class="btn btn-danger btn-sm ms-1" @onclick="() => remove_user(email)">
-        <i class="bi bi-trash3"></i>
-      </button>
-    </div>
+    <EditUser email="@email"/>
   }
-
 </div>
 
-<style>
-  .page-wrapper {
-    max-width: 400px;
-  }
-</style>
+@code
+{
+  [Inject] private AppDbContext db_context { get; set; } = null!;
 
-@code {
-  [Inject] private AppDbContext      db_context         { get; set; } = null!;
-  [Inject] private NavigationManager navigation_manager { get; set; } = null!;
-  [Inject] private ILogger<Users>    logger             { get; set; } = null!;
-
-  private string?  error { get; set; }
   private string[] emails = [];
-
-  [SupplyParameterFromForm] private string? add_user_email { get; set; }
 
   protected override async Task OnInitializedAsync()
   {
-    await refresh();
-  }
-
-  private async Task refresh()
-  {
-    emails = await db_context.users.Select(x => x.email).ToArrayAsync();
-  }
-
-  private Task add_user() => handle_errors(async () =>
-  {
-    logger.LogInformation("Try add user '{}'", add_user_email);
-    if (string.IsNullOrEmpty(add_user_email))
-      throw new Exception("Email is empty");
-
-    _ = new MailAddress(add_user_email); // validation
-
-    db_context.users.Add(new UserStored { email = add_user_email });
-    await db_context.SaveChangesAsync();
-  });
-
-  private Task remove_user(string email) => handle_errors(async () =>
-  {
-    db_context.users.RemoveRange(db_context.users.Where(x => x.email == email));
-    await db_context.SaveChangesAsync();
-  });
-
-  private async Task handle_errors(Func<Task> action)
-  {
-    try
-    {
-      await action();
-      error = null;
-    }
-    catch (DbUpdateException e)
-    {
-      error = e.InnerException!.Message;
-      db_context.ChangeTracker.Clear();
-    }
-    catch (Exception e)
-    {
-      error = e.Message;
-    }
-    finally
-    {
-      await refresh();
-    }
+    emails = await db_context.users
+      .OrderBy(x => x.email)
+      .Select(x => x.email)
+      .ToArrayAsync();
   }
 }

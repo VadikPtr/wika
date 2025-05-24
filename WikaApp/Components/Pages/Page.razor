@@ -1,0 +1,41 @@
+﻿@page "/pages/{*path}"
+@using Microsoft.EntityFrameworkCore
+@using WikaApp.Auth
+@using WikaApp.Components.Layout
+@using WikaApp.Components.Components
+@attribute [RequireAuthorization]
+@layout PageLayout
+
+<PageTitle>@path</PageTitle>
+
+@if (page == null)
+{
+  <h1>Page with path @path not found.</h1>
+  <AddPage path="@path"/>
+}
+else
+{
+  <h1>@path</h1>
+  <pre>modified: @(page.last_modified)</pre>
+  <pre>@(page.content)</pre>
+}
+
+@code
+{
+  [Inject] private AppDbContext   db_context { get; set; } = null!;
+  [Inject] private ILogger<Users> logger     { get; set; } = null!;
+
+  [Parameter] public string path { get; set; } = null!;
+
+  private PageStored? page { get; set; }
+
+  protected override async Task OnInitializedAsync()
+  {
+    await refresh();
+  }
+
+  private async Task refresh()
+  {
+    page = await db_context.pages.FirstOrDefaultAsync(x => x.path == path);
+  }
+}

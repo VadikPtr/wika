@@ -1,16 +1,13 @@
 ﻿@page "/"
 @using WikaApp.Auth
+@using WikaApp.Components.Layout
 @attribute [RequireAuthorization]
+@layout PageLayout
 
 <PageTitle>Home</PageTitle>
 
-<nav class="nav flex-column">
-  <a class="nav-link" href="/">Page 1</a>
-  <a class="nav-link" href="/">Page 2</a>
-</nav>
+<h1>Home page</h1>
 
-@code {
-  [CascadingParameter] public HttpContext http_context { get; set; } = null!;
-
-  protected override async Task OnInitializedAsync() {}
+@code
+{
 }

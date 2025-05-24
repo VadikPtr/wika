@@ -17,22 +17,11 @@
 <a href="/auth/login-start">Try again</a>
 
 <script>
-  let popover;
-
-  addEventListener("DOMContentLoaded", () => {
-    popover = new bootstrap.Popover(
-      document.getElementById('copy-email'), {
-        trigger: 'manual',
-        placement: 'bottom',
-      }
-    );
-  });
-
   function copyEmail() {
     navigator.clipboard.writeText("@http_context.get_email()")
       .then(() => {
-        popover.show();
-        setTimeout(() => popover.hide(), 1000);
+        copyEmailElPopover.show();
+        setTimeout(() => copyEmailElPopover.hide(), 1000);
       })
       .catch((err) => {
         alert(err.toString());

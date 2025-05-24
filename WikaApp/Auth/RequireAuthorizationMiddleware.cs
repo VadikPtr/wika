@@ -25,13 +25,10 @@ public sealed class RequireAuthorizationMiddleware(
         return;
       }
 
-      var email = context.User
-        .FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress")
-        ?.Value;
-
+      var       email      = context.get_email();
       using var scope      = sp.CreateScope();
       var       db_context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-      if (email != null && !await db_context.users.AnyAsync(x => x.email == email))
+      if (!await db_context.users.AnyAsync(x => x.email == email))
       {
         logger.LogDebug("No email address found in database: {}.", email);
         context.Response.Redirect("/auth/sorry");

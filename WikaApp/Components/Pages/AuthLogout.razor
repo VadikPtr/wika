@@ -1,19 +1,20 @@
 @page "/auth/logout"
 @using Microsoft.AspNetCore.Authentication
+@using WikaApp.Auth
 
 <PageTitle>Logout</PageTitle>
 <h3>Logout... wait</h3>
 
 @code {
-  [CascadingParameter] private HttpContext       http_content       { get; set; } = null!;
+  [CascadingParameter] private HttpContext       http_context       { get; set; } = null!;
   [Inject]             private NavigationManager navigation_manager { get; set; } = null!;
 
   protected override async Task OnInitializedAsync()
   {
     await base.OnInitializedAsync();
 
-    if (http_content.is_authenticated())
-      await http_content.SignOutAsync();
+    if (http_context.is_authenticated())
+      await http_context.SignOutAsync();
 
     navigation_manager.NavigateTo("/");
   }

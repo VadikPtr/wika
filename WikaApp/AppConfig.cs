@@ -7,7 +7,6 @@ public class AppConfig(IConfiguration configuration)
 
   private static string get_value(IConfiguration configuration, string key)
   {
-    Console.WriteLine($"CWD: {Environment.CurrentDirectory}");
     var value = configuration[key];
     if (string.IsNullOrWhiteSpace(value))
       throw new Exception($"Missing configuration value for key: {key}");

@@ -1,0 +1,48 @@
+﻿@page "/auth/login"
+
+<PageTitle>Login</PageTitle>
+
+<h1>Login</h1>
+<button onclick="startLogin()" class="btn btn-primary">Google Auth</button>
+<div class="progress mt-2 d-none" id="loader">
+  <div class="progress-bar bg-success" role="progressbar" id="loader-progress"></div>
+</div>
+
+<script>
+  function startLogin() {
+    document.getElementById("loader").classList.remove('d-none')
+    document.location = "/auth/login-start";
+  }
+</script>
+
+<style>
+  #loader {
+    max-width: 200px;
+  }
+
+  #loader-progress {
+    animation: loading 4s ease-in-out infinite;
+  }
+
+  @@keyframes loading {
+    0% {
+      width: 0
+    }
+    100% {
+      width: 100%
+    }
+  }
+</style>
+
+@code {
+  [CascadingParameter] public  HttpContext       http_context       { get; set; } = null!;
+  [Inject]             private NavigationManager navigation_manager { get; set; } = null!;
+
+  protected override async Task OnInitializedAsync()
+  {
+    await base.OnInitializedAsync();
+
+    if (http_context.is_authenticated())
+      navigation_manager.NavigateTo("/");
+  }
+}

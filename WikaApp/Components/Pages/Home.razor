@@ -1,18 +1,18 @@
 ﻿@page "/"
-@attribute [GoogleScopedAuthorize]
+@using WikaApp.Auth
+@attribute [RequireAuthorization]
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, @HttpContext?.User.FindFirst("name")?.Value</h1>
-<img src="@HttpContext?.User.FindFirst("picture")?.Value" alt="picture"/>
+<h1>Hello, @http_context.User.FindFirst("name")?.Value</h1>
+<img src="@http_context.User.FindFirst("picture")?.Value" alt="picture"/>
 
-<a href="/logout">Logout</a>
+<a href="/auth/logout">Logout</a>
 
 @code {
-    [CascadingParameter] public HttpContext? HttpContext { get; set; }
+  [CascadingParameter] public HttpContext http_context { get; set; } = null!;
 
-    protected override async Task OnInitializedAsync()
-    {
-        // name, picture
-    }
+  protected override async Task OnInitializedAsync()
+  {
+  }
 }

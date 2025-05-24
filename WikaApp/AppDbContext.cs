@@ -15,13 +15,8 @@ public class AppDbContext(DbContextOptions options) : DbContext(options)
 
   protected override void OnModelCreating(ModelBuilder model_builder)
   {
-    model_builder
-      .Entity<UserStored>()
-      .HasKey(x => x.email);
-
-    model_builder
-      .Entity<PageStored>()
-      .HasKey(x => x.path);
+    model_builder.Entity<UserStored>().HasKey(x => x.email);
+    model_builder.Entity<PageStored>().HasKey(x => x.path);
   }
 }
 
@@ -32,7 +27,7 @@ public class UserStored
 
 public class PageStored
 {
-  [MaxLength(256)] public required string path { get; set; }
-  public required string content { get; set; }
-  public required DateTimeOffset last_modified { get; set; }
+  [MaxLength(256)] public required string         path          { get; set; }
+  public required                  string         content       { get; set; }
+  public required                  DateTimeOffset last_modified { get; set; }
 }

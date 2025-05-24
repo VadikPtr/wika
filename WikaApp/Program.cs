@@ -1,8 +1,6 @@
-using Google.Apis.Auth.AspNetCore3;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using WikaApp;
+using WikaApp.Auth;
 using WikaApp.Components;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,54 +13,23 @@ builder.Services
   .AddDbContextFactory<AppDbContext>()
   .AddDbContext<AppDbContext>()
   .AddSingleton<AppConfig>()
-  .AddSingleton<IConfiguration>(_ => create_configuration());
-
-builder.Services
-  .AddAuthentication(o => {
-    o.DefaultChallengeScheme = GoogleOpenIdConnectDefaults.AuthenticationScheme;
-    o.DefaultForbidScheme    = GoogleOpenIdConnectDefaults.AuthenticationScheme;
-    o.DefaultScheme          = CookieAuthenticationDefaults.AuthenticationScheme;
-  })
-  .AddCookie()
-  .AddGoogleOpenIdConnect(options =>
-  {
-    var app_config = new AppConfig(create_configuration());
-    options.ClientId             = app_config.oauth_client_id;
-    options.ClientSecret         = app_config.oauth_client_secret;
-    options.CallbackPath         = "/signin-oidc";
-    options.SignedOutRedirectUri = "/logout";
-  });
-
-builder.Services.Configure<CookieAuthenticationOptions>(
-CookieAuthenticationDefaults.AuthenticationScheme,
-options => {
-  options.Cookie.SameSite     = SameSiteMode.None;
-  options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-}
-);
-builder.Services.AddAuthorization();
-builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddTransient<IAuthorizationMiddlewareResultHandler, AppDbAuthorizationMiddleware>();
+  .AddSingleton<IConfiguration>(_ => create_configuration())
+  .configure_authentication_and_authorization(create_configuration());
 
 builder.WebHost.UseStaticWebAssets();
 
 var app = builder.Build();
 
 app.UseForwardedHeaders();
-
 if (!app.Environment.IsDevelopment())
 {
   app.UseExceptionHandler("/Error", createScopeForErrors: true);
   app.UseHsts();
 }
-
 app.UseAntiforgery();
-app.UseAuthentication();
-app.UseAuthorization();
+app.use_authentication_and_authorization();
 app.UseStaticFiles(); // NOTE: Serve files from wwwroot
-
-app.MapRazorComponents<App>()
-  .AddInteractiveServerRenderMode();
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -71,10 +38,8 @@ using (var scope = app.Services.CreateScope())
   scope.ServiceProvider.GetRequiredService<AppConfig>(); // NOTE: warmup
 
   context.Database.EnsureCreated();
-
   if (context.Database.GetPendingMigrations().Any())
     context.Database.Migrate();
-
   logger.LogDebug("Database model: {}", context.Model.ToDebugString());
 }
 

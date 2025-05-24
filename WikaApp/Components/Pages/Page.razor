@@ -16,12 +16,12 @@
 }
 else if (edit.HasValue && edit.Value)
 {
-  <h1>@path</h1>
+  <h1 class="mb-3">@path</h1>
   <EditPage page=@(page) />
 }
 else
 {
-  <div class="d-flex flex-row align-items-center">
+  <div class="d-flex flex-row align-items-center mb-3">
     <h1 class="flex-grow-1">@path</h1>
 
     <div class="mx-3">@(page.last_modified)</div>

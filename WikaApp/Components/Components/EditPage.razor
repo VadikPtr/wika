@@ -1,10 +1,75 @@
-﻿<pre>RENDER EDITOR: @(page.content)</pre>
+﻿@using Microsoft.EntityFrameworkCore
 
-<a type="button" class="btn btn-outline-secondary" href=@("/pages/" + page.path)>
-  <i class="bi bi-x-circle"></i> Cancel
-</a>
+<pre id="editor" class="w-100">@(page.content)</pre>
+
+@if (!string.IsNullOrEmpty(error))
+{
+  <div class="alert alert-danger" role="alert">
+    Error: @error
+  </div>
+}
+
+<div class="d-flex flex-row align-items-center">
+  <a type="button" class="btn btn-outline-secondary mt-3" href=@("/pages/" + page.path)>
+    <i class="bi bi-x-circle"></i> Cancel
+  </a>
+
+  <div class="flex-grow-1">&nbsp;</div>
+
+  <form method="post" @onsubmit="save" @formname="save_page">
+    <InputTextArea @bind-Value="edit_content" id="edit_content" hidden/>
+    <button type="submit" class="btn btn-outline-primary">
+      <i class="bi bi-floppy"></i> Save
+    </button>
+    <AntiforgeryToken/>
+  </form>
+</div>
 
 @code
 {
   [Parameter] public PageStored page { get; set; } = null!;
+
+  [Inject] private AppDbContext      db_context         { get; set; } = null!;
+  [Inject] private NavigationManager navigation_manager { get; set; } = null!;
+  [Inject] private ILogger<EditPage> logger             { get; set; } = null!;
+
+  [SupplyParameterFromForm] private string? edit_content { get; set; }
+
+  private string? error        { get; set; }
+  private string? bind_content { get; set; }
+  private bool    need_refresh = true;
+
+  private Task save() => handle_errors(async () =>
+  {
+    logger.LogInformation("Save page '{}'", page.path);
+    var tracked_page = await db_context.pages.SingleAsync(x => x.path == page.path);
+    tracked_page.content = edit_content ?? string.Empty;
+    await db_context.SaveChangesAsync();
+    need_refresh = true;
+  });
+
+  private async Task handle_errors(Func<Task> action)
+  {
+    try
+    {
+      await action();
+      error = null;
+    }
+    catch (DbUpdateException e)
+    {
+      error = e.InnerException?.Message ?? e.Message;
+      db_context.ChangeTracker.Clear();
+    }
+    catch (Exception e)
+    {
+      error = e.Message;
+    }
+    finally
+    {
+      if (need_refresh)
+      {
+        navigation_manager.Refresh(true);
+      }
+    }
+  }
 }

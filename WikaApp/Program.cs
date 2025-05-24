@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using WikaApp;
 using WikaApp.Auth;
@@ -14,7 +15,11 @@ builder.Services
   .AddDbContext<AppDbContext>()
   .AddSingleton<AppConfig>()
   .AddSingleton<IConfiguration>(_ => create_configuration())
-  .configure_authentication_and_authorization(create_configuration());
+  .configure_authentication_and_authorization(create_configuration())
+  .Configure<ForwardedHeadersOptions>(
+    opts => opts.ForwardedHeaders = ForwardedHeaders.XForwardedFor |
+                                    ForwardedHeaders.XForwardedProto
+  );
 
 builder.WebHost.UseStaticWebAssets();
 

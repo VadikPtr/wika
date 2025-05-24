@@ -50,8 +50,8 @@ IConfiguration create_configuration()
 {
   var b = new ConfigurationBuilder();
   b.AddJsonFile("appsettings.json");
-  if (builder.Environment.IsDevelopment())
-    b.AddJsonFile("appsettings.Development.json");
+  if (!string.IsNullOrEmpty(builder.Environment.EnvironmentName))
+    b.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json");
   b.AddEnvironmentVariables();
   return b.Build();
 }

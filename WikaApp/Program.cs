@@ -26,8 +26,8 @@ if (!app.Environment.IsDevelopment())
   app.UseExceptionHandler("/Error", createScopeForErrors: true);
   app.UseHsts();
 }
-app.UseAntiforgery();
 app.use_authentication_and_authorization();
+app.UseAntiforgery();
 app.UseStaticFiles(); // NOTE: Serve files from wwwroot
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 

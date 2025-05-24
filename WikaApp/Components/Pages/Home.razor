@@ -4,15 +4,13 @@
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, @http_context.User.FindFirst("name")?.Value</h1>
-<img src="@http_context.User.FindFirst("picture")?.Value" alt="picture"/>
-
-<a href="/auth/logout">Logout</a>
+<nav class="nav flex-column">
+  <a class="nav-link" href="/">Page 1</a>
+  <a class="nav-link" href="/">Page 2</a>
+</nav>
 
 @code {
   [CascadingParameter] public HttpContext http_context { get; set; } = null!;
 
-  protected override async Task OnInitializedAsync()
-  {
-  }
+  protected override async Task OnInitializedAsync() {}
 }

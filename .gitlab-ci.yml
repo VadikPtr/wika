@@ -1,5 +1,6 @@
 build-job:
   stage: build
+  tags: [linux]
   before_script:
     - git lfs pull
   script:
@@ -11,6 +12,7 @@ build-job:
     
 deploy-prod:
   stage: deploy
+  tags: [linux]
   variables:
     INSTALL_DIR: "/home/fotobuh/wika"
   script:

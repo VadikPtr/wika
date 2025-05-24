@@ -1,0 +1,26 @@
+build-job:
+  stage: build
+  before_script:
+    - git lfs pull
+  script:
+    - dotnet publish -c Release --self-contained -r linux-x64
+  artifacts:
+    paths:
+      - WikaApp/bin/Release/net8.0/linux-x64/publish
+    expire_in: 1 week
+    
+deploy-prod:
+  stage: deploy
+  variables:
+    INSTALL_DIR: "/home/fotobuh/wika"
+  script:
+    - echo $USER_PASSWORD | sudo -S -k  systemctl stop wika
+    - echo $USER_PASSWORD | sudo -S -k  cp -r WikaApp/bin/Release/net8.0/linux-x64/publish/* $INSTALL_DIR
+    - echo $USER_PASSWORD | sudo -S -k  chmod -R 744 $INSTALL_DIR/*
+    - echo $USER_PASSWORD | sudo -S -k  chown -R fotobuh:fotobuh $INSTALL_DIR
+    - echo $USER_PASSWORD | sudo -S -k  sudo systemctl restart wika
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      when: always
+    - if: $CI_COMMIT_BRANCH != $CI_DEFAULT_BRANCH
+      when: manual

@@ -10,13 +10,32 @@
 
 @if (page == null)
 {
-  <h1>Page with path @path not found.</h1>
+  <h1>@path</h1>
+  <h2>Page with path @path not found.</h2>
   <AddPage path="@path"/>
+}
+else if (edit.HasValue && edit.Value)
+{
+  <h1>@path</h1>
+  <pre>RENDER EDITOR: @(page.content)</pre>
 }
 else
 {
-  <h1>@path</h1>
-  <pre>modified: @(page.last_modified)</pre>
+  <div class="d-flex flex-row align-items-center">
+    <h1 class="flex-grow-1">@path</h1>
+
+    <div class="mx-3">@(page.last_modified)</div>
+
+    <div class="btn-group">
+      <a type="button" class="btn btn-outline-secondary" href=@("/pages/" + path + "?edit=true")>
+        <i class="bi bi-pencil"></i> Edit
+      </a>
+      <button type="button" class="btn btn-outline-secondary">
+        <i class="bi bi-trash"></i> Remove
+      </button>
+    </div>
+  </div>
+
   <pre>@(page.content)</pre>
 }
 
@@ -24,6 +43,8 @@ else
 {
   [Inject] private AppDbContext   db_context { get; set; } = null!;
   [Inject] private ILogger<Users> logger     { get; set; } = null!;
+
+  [SupplyParameterFromQuery] public bool? edit { get; set; }
 
   [Parameter] public string path { get; set; } = null!;
 

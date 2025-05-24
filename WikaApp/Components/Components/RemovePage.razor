@@ -1,16 +1,8 @@
-﻿<form class="mt-2 d-flex flex-row align-items-center" method="post" @onsubmit="remove_user"
-      @formname=@("remove_user_" + email)>
-  <div>@email</div>
-  <button class="btn btn-danger btn-sm ms-1" type="submit">
-    <i class="bi bi-trash3"></i>
+﻿<form method="post" @onsubmit="remove_page" @formname="remove_page">
+  <button type="submit" class="btn btn-outline-danger remove-page">
+    <i class="bi bi-trash"></i> Remove
   </button>
   <AntiforgeryToken/>
-</form>
-
-<form>
-<button type="button" class="btn btn-outline-secondary">
-  <i class="bi bi-trash"></i> Remove
-</button>
 </form>
 
 @code
@@ -21,7 +13,7 @@
 
   [Parameter] public string path { get; set; } = null!;
 
-  private async Task remove_user()
+  private async Task remove_page()
   {
     logger.LogInformation("Remove page '{}'", path);
     db_context.pages.RemoveRange(db_context.pages.Where(x => x.path == path));

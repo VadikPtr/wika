@@ -17,7 +17,7 @@
 else if (edit.HasValue && edit.Value)
 {
   <h1>@path</h1>
-  <pre>RENDER EDITOR: @(page.content)</pre>
+  <EditPage page=@(page) />
 }
 else
 {
@@ -40,10 +40,6 @@ else
 <style>
   .edit-page {
     border-right: 0;
-  }
-  .remove-page {
-    border-top-left-radius: 0;
-    border-bottom-left-radius: 0;
   }
 </style>
 

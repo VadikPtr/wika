@@ -30,7 +30,7 @@
   private string? error { get; set; }
   private bool    needs_refresh;
 
-  protected override async Task OnInitializedAsync()
+  protected override void OnInitialized()
   {
     add_path = path;
   }

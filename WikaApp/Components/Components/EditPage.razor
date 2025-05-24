@@ -1,0 +1,10 @@
+﻿<pre>RENDER EDITOR: @(page.content)</pre>
+
+<a type="button" class="btn btn-outline-secondary" href=@("/pages/" + page.path)>
+  <i class="bi bi-x-circle"></i> Cancel
+</a>
+
+@code
+{
+  [Parameter] public PageStored page { get; set; } = null!;
+}

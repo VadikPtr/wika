@@ -37,7 +37,7 @@
 
   private string? error        { get; set; }
   private string? bind_content { get; set; }
-  private bool    need_refresh = true;
+  private bool    need_refresh = false;
 
   private Task save() => handle_errors(async () =>
   {
@@ -68,7 +68,7 @@
     {
       if (need_refresh)
       {
-        navigation_manager.Refresh(true);
+        navigation_manager.NavigateTo("/pages/" + page.path, true);
       }
     }
   }

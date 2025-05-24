@@ -1,8 +1,11 @@
 let copyEmailElPopover;
 let editor;
+let mdConverter;
 
 function onPageRefreshed() {
   console.log('onPageRefreshed');
+
+  renderMarkdown();
 
   const copyEmailEl = document.getElementById('copy-email');
   if (copyEmailEl) {
@@ -32,6 +35,7 @@ function onPageRefreshed() {
       editContentEl.value = editor.getSession().getValue();
     });
     editorEl.classList.add('editorInitialized');
+    editContentEl.value = editor.getSession().getValue();
   }
 }
 
@@ -54,4 +58,45 @@ addEventListener("DOMContentLoaded", () => {
 function startLogin() {
   document.getElementById("loader").classList.remove('d-none')
   document.location = "/auth/login-start";
+}
+
+function renderMarkdown() {
+  if (!mdConverter) {
+    mdConverter = new showdown.Converter({
+      extensions: ["github"],
+      emoji: true,
+      simpleLineBreaks: true,
+      tables: true,
+      parseImgDimensions: true,
+      headerLevelStart: 2,
+    });
+    mdConverter.setFlavor("github");
+  }
+
+  const mdText = document.getElementById("md-text");
+  if (!mdText || mdText.classList.contains('markdownInitialized')) {
+    return;
+  }
+
+  mdText.classList.add('markdownInitialized');
+  document.getElementById("md-render").innerHTML = mdConverter.makeHtml(mdText.textContent);
+
+  // TODO:
+  // const mdHeader = $("#md-render > :header:first-child").text();
+  // if (mdHeader.length) {
+  //   document.title = mdHeader;
+  // }
+  // $("table").each(function () {
+  //   const el = $(this);
+  //   if (!el.hasClass("table")) {
+  //     el.addClass("table");
+  //   }
+  // });
+  //
+  // $("blockquote").each(function () {
+  //   const el = $(this);
+  //   if (!el.hasClass("blockquote")) {
+  //     el.addClass("blockquote");
+  //   }
+  // });
 }

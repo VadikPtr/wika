@@ -56,3 +56,7 @@ a.nav-link.active {
 .nav a {
   overflow-wrap: anywhere;
 }
+
+img {
+  max-width: 100%;
+}

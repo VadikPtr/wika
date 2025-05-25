@@ -16,25 +16,26 @@ public static class ConfigureAuth
         o.DefaultForbidScheme    = GoogleOpenIdConnectDefaults.AuthenticationScheme;
         o.DefaultScheme          = CookieAuthenticationDefaults.AuthenticationScheme;
       })
-      .AddCookie()
+      .AddCookie(o =>
+      {
+        o.Cookie.SameSite     = SameSiteMode.None;
+        o.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        o.SlidingExpiration   = true;
+      })
       .AddGoogleOpenIdConnect(o =>
       {
         var app_config = new AppConfig(configuration);
-        o.ClientId     = app_config.oauth_client_id;
-        o.ClientSecret = app_config.oauth_client_secret;
-        o.CallbackPath = "/signin-oidc";
+        o.ClientId                = app_config.oauth_client_id;
+        o.ClientSecret            = app_config.oauth_client_secret;
+        o.CallbackPath            = "/signin-oidc";
+        o.Events.OnTicketReceived = context =>
+        {
+          context.Properties!.IsPersistent = true;
+          return Task.CompletedTask;
+        };
       });
 
     services
-      .Configure<CookieAuthenticationOptions>(
-        CookieAuthenticationDefaults.AuthenticationScheme,
-        o =>
-        {
-          o.Cookie.SameSite     = SameSiteMode.None;
-          o.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-          o.Cookie.Expiration   = TimeSpan.FromDays(15);
-        }
-      )
       .AddAuthorization()
       .AddCascadingAuthenticationState();
 

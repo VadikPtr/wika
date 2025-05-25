@@ -9,7 +9,7 @@ html, body {
 
 #md-render * pre, #md-render pre {
   border: 1px var(--bs-gray-900) solid;
-  border-radius: 0.25rem;
+  border-radius: var(--bs-border-radius);
   background-color: var(--bs-gray-800);
 }
 .hljs {
@@ -37,7 +37,7 @@ a.nav-link.active {
   padding-left: 1rem;
   font-size: 1rem !important;
   background-color: #4f4f4f70;
-  border-radius: 0.25rem;
+  border-radius: var(--bs-border-radius);
 }
 
 #md-render p, #md-render * p {

@@ -23,7 +23,7 @@ function onPageRefreshed() {
 
   if (editorEl && editContentEl && !editContentEl.classList.contains('editorInitialized')) {
     editor = ace.edit(editorEl, {
-      theme: "ace/theme/textmate",
+      theme: "ace/theme/github_dark",
       mode: "ace/mode/markdown",
       autoScrollEditorIntoView: true,
       maxLines: 5000,

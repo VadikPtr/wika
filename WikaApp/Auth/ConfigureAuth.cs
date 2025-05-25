@@ -32,6 +32,7 @@ public static class ConfigureAuth
         {
           o.Cookie.SameSite     = SameSiteMode.None;
           o.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+          o.Cookie.Expiration   = TimeSpan.FromDays(15);
         }
       )
       .AddAuthorization()

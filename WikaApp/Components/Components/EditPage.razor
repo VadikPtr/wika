@@ -43,7 +43,8 @@
   {
     logger.LogInformation("Save page '{}'", page.path);
     var tracked_page = await db_context.pages.SingleAsync(x => x.path == page.path);
-    tracked_page.content = edit_content ?? string.Empty;
+    tracked_page.content       = edit_content ?? string.Empty;
+    tracked_page.last_modified = DateTimeOffset.Now;
     await db_context.SaveChangesAsync();
     need_refresh = true;
   });

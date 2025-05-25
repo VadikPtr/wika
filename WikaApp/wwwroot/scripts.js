@@ -26,11 +26,12 @@ function onPageRefreshed() {
       theme: "ace/theme/textmate",
       mode: "ace/mode/markdown",
       autoScrollEditorIntoView: true,
-      maxLines: 100,
-      tabSize: 2,
-      // TODO: useSoftTabs: true,
-      // TODO: useWrapMode: true,
+      maxLines: 5000,
+      tabSize: 4,
     });
+    editor.setShowPrintMargin(false);
+    editor.session.setUseWrapMode(true);
+    editor.session.setUseSoftTabs(true);
     editor.session.on('change', function () {
       editContentEl.value = editor.getSession().getValue();
     });
@@ -63,12 +64,14 @@ function startLogin() {
 function renderMarkdown() {
   if (!mdConverter) {
     mdConverter = new showdown.Converter({
-      extensions: ["github"],
+      extensions: ["github", "youtube"],
       emoji: true,
       simpleLineBreaks: true,
       tables: true,
       parseImgDimensions: true,
-      headerLevelStart: 2,
+      headerLevelStart: 1,
+      disableForced4SpacesIndentedSublists: true,
+      tasklists: true,
     });
     mdConverter.setFlavor("github");
   }
@@ -99,4 +102,10 @@ function renderMarkdown() {
   //     el.addClass("blockquote");
   //   }
   // });
+
+  document.querySelectorAll("blockquote").forEach((el) => {
+    if (!el.className.includes("blockquote")) {
+      el.classList.add("blockquote");
+    }
+  });
 }

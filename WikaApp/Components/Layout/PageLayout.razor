@@ -3,15 +3,19 @@
 
 <MainLayout>
   <Body>
-  <nav class="nav flex-column">
-    @foreach (var path in pages_paths)
-    {
-      <NavLink class="nav-link" href=@("/pages/" + path) Match="NavLinkMatch.All">
-        @path
-      </NavLink>
-    }
-  </nav>
-  @Body
+  <div class="row">
+    <nav class="nav flex-column col-sm-3 col-xs-12">
+      @foreach (var path in pages_paths)
+      {
+        <NavLink class="nav-link" href=@("/pages/" + path) Match="NavLinkMatch.All">
+          @path
+        </NavLink>
+      }
+    </nav>
+    <div class="col-sm-9 col-xs-12">
+      @Body
+    </div>
+  </div>
   </Body>
 </MainLayout>
 

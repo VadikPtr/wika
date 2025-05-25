@@ -20,3 +20,30 @@
 a.nav-link.active {
   font-weight: bold;
 }
+
+#md-render .blockquote, #md-render * .blockquote {
+  margin-top: 0.5rem;
+  margin-bottom: 0.25rem;
+  border-left: 0.25rem var(--bs-primary) solid;
+  padding-left: 1rem;
+  font-size: 1rem !important;
+  background-color: var(--bs-gray-100);
+  border-radius: 0.25rem;
+}
+
+#md-render p, #md-render * p {
+  margin-bottom: 0.25rem !important;
+}
+
+#md-render h1, #md-render * h1,
+#md-render h2, #md-render * h2,
+#md-render h3, #md-render * h3,
+#md-render h4, #md-render * h4,
+#md-render h5, #md-render * h5 {
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.nav a {
+  overflow-wrap: anywhere;
+}

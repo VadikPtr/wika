@@ -64,7 +64,7 @@ function startLogin() {
 function renderMarkdown() {
   if (!mdConverter) {
     mdConverter = new showdown.Converter({
-      extensions: ["github", "youtube"],
+      extensions: ["github", "youtube", showdownHighlight],
       emoji: true,
       simpleLineBreaks: true,
       tables: true,
